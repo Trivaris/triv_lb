@@ -14,12 +14,7 @@ RUN go test -v ./...
 
 FROM gcr.io/distroless/base-debian11 AS build-release-stage
 
-WORKDIR /config
-
-USER nonroot:nonroot
-
 COPY --from=build-stage /triv_lb /triv_lb
 EXPOSE 8080
 
-ENTRYPOINT ["/triv_lb", "--port", "8080"]
-CMD [ "--config", "/config/config.json" ]
+ENTRYPOINT ["/triv_lb", "--port", "8080", "--config", "/config/config.json"]
