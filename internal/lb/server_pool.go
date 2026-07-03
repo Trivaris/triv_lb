@@ -1,4 +1,4 @@
-package main
+package lb
 
 import (
 	"log"
@@ -11,8 +11,19 @@ type ServerPool struct {
 	current uint64
 }
 
+func NewServerPool() *ServerPool {
+	return &ServerPool{
+		backends: []*Backend{},
+		current:  0,
+	}
+}
+
 func (s *ServerPool) NextIndex() int {
 	return int(atomic.AddUint64(&s.current, uint64(1)) % uint64(len(s.backends)))
+}
+
+func (s *ServerPool) SetBackends(backends []*Backend) {
+	s.backends = backends
 }
 
 func (s *ServerPool) GetNextPeer() *Backend {
@@ -43,7 +54,7 @@ func (s *ServerPool) HealthCheck() {
 	}
 }
 
-func (s *ServerPool) backgroundHealthCheck(d time.Duration) {
+func (s *ServerPool) BackgroundHealthCheck(d time.Duration) {
 	t := time.NewTicker(d)
 	for range t.C {
 		log.Println("Starting health check...")

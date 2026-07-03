@@ -1,4 +1,4 @@
-package main
+package lb
 
 import (
 	"log"
@@ -9,7 +9,7 @@ type LoadBalancer struct {
 	serverPool	*ServerPool
 }
 
-func (lb *LoadBalancer) lb(w http.ResponseWriter, r *http.Request) {
+func (lb *LoadBalancer) LoadBalance(w http.ResponseWriter, r *http.Request) {
 	attempts := GetAttemptsFromContext(r)
 
 	if attempts > 3 {
@@ -24,4 +24,10 @@ func (lb *LoadBalancer) lb(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	http.Error(w, "Service not available", http.StatusServiceUnavailable)
+}
+
+func NewLoadBalancer(pool *ServerPool) *LoadBalancer {
+	return &LoadBalancer{
+		serverPool: pool,
+	}
 }
